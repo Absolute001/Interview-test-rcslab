@@ -3,6 +3,7 @@ import { render, screen } from "@testing-library/react";
 import { App } from "./App";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import fetchMock from "jest-fetch-mock";
+import { CardsAdd } from "./components/cardForm/CardsAdd";
 
 const queryClient = new QueryClient();
 
@@ -57,4 +58,26 @@ test("should render 0 cards if not valid cards is sent by BE", async () => {
 
 
   expect(screen.queryAllByText('3538-9020-4943-556').length).toBe(0)
+});
+
+test("renders without errors AddCards", async () => {
+  fetchMock.mockResponseOnce(
+    JSON.stringify([
+      {
+        cardNumber: "3538-9020-4943-556",
+        circuit: "Visa",
+        exp: "23/11/2022",
+        cvv: 180,
+        id: 2,
+      },
+    ])
+  );
+  render(
+    <QueryClientProvider client={queryClient}>
+      <CardsAdd />
+    </QueryClientProvider>
+  );
+
+  const text = await screen.findByText("Crea una nuova carta");
+  expect(text).toBeInTheDocument();
 });
